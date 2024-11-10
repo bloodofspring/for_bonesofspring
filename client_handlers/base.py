@@ -1,9 +1,10 @@
-from pyrogram.filters import create, command, regex
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram import Client
-
+from pyrogram.filters import create, command, regex
+from pyrogram.handlers import MessageHandler
 
 __all__ = ["BaseHandler", "Client", "command", "regex", "create"]
+
+from pyrogram.types import Message, CallbackQuery
 
 
 class BaseHandler:
@@ -13,7 +14,7 @@ class BaseHandler:
     FILTER = create(lambda _, __, ___: False)
 
     def __init__(self):
-        self.request: MessageHandler | CallbackQueryHandler | None = None
+        self.request: Message | CallbackQuery | None = None
         self.client: Client | None = None
 
     async def func(self):
