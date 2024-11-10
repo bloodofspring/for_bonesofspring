@@ -1,9 +1,9 @@
 """Инициализация бота"""
-from pyrogram import Client
+from os import environ
 from typing import Final
 
 from dotenv import load_dotenv
-from os import environ
+from pyrogram import Client
 
 load_dotenv()
 

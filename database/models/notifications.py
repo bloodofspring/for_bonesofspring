@@ -12,6 +12,7 @@ class SendTime(BaseModel):
 class ChatToSend(BaseModel):
     tg_id = IntegerField()
 
+
 class Notifications(BaseModel):
     text = CharField()
     send_time = ForeignKeyField(SendTime)
