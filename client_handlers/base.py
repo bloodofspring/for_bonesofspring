@@ -1,5 +1,5 @@
 from pyrogram.filters import create, command, regex
-from pyrogram.handlers import MessageHandler
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram import Client
 
 
@@ -11,6 +11,10 @@ class BaseHandler:
     __name__ = ""
     HANDLER = MessageHandler
     FILTER = create(lambda _, __, ___: False)
+
+    def __init__(self):
+        self.request: MessageHandler | CallbackQueryHandler | None = None
+        self.client: Client | None = None
 
     async def func(self):
         raise NotImplementedError

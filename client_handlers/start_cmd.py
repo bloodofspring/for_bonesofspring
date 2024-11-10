@@ -20,4 +20,4 @@ class StartCmd(BaseHandler):
         return map(lambda t: t.oper[0], nearest)
 
     async def func(self):
-        pass
+        await self.request.
