@@ -17,5 +17,5 @@ class ChatToSend(BaseModel):
 
 class Notifications(BaseModel):
     text = CharField()
-    send_time = ForeignKeyField(SendTime)
-    chat_to_send = ForeignKeyField(ChatToSend)
+    send_time = ForeignKeyField(SendTime, backref="oper")
+    chat_to_send = ForeignKeyField(ChatToSend, backref="oper")

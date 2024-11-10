@@ -17,7 +17,7 @@ class StartCmd(BaseHandler):
             (SendTime.send_time >= now.time())
         ).order_by(SendTime.send_time)
 
-        return nearest[:]
+        return map(lambda t: t.oper[0], nearest)
 
     async def func(self):
         pass
