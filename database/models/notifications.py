@@ -1,7 +1,7 @@
 from peewee import CharField, BooleanField, IntegerField, ForeignKeyField, DateField, TimeField
 
 from database.models.base import BaseModel
-from database.models.users import ChatToSend, User
+from database.models.users import ChatToSend, Users
 
 
 class SendTime(BaseModel):
@@ -14,6 +14,6 @@ class SendTime(BaseModel):
 
 class Notifications(BaseModel):
     text = CharField()
-    send_time = ForeignKeyField(SendTime, backref="oper")
+    send_at = ForeignKeyField(SendTime, backref="oper")
     chat_to_send = ForeignKeyField(ChatToSend, backref="oper")
-    created_by = ForeignKeyField(User, backref="notifications")
+    created_by = ForeignKeyField(Users, backref="notifications")

@@ -6,6 +6,8 @@ __all__ = ["BaseHandler", "Client", "command", "regex", "create"]
 
 from pyrogram.types import Message, CallbackQuery
 
+from database.models.users import Users
+
 
 class BaseHandler:
     """Базовый обработчик-исполнитель"""
@@ -16,6 +18,16 @@ class BaseHandler:
     def __init__(self):
         self.request: Message | CallbackQuery | None = None
         self.client: Client | None = None
+
+    @property
+    def db_user(self):
+        user_id = self.request.message.chat.id if isinstance(self.request, CallbackQuery) else self.request.chat.id
+        db, created = Users.get_or_create(tg_id=user_id)[0]
+
+        if created:
+            print(f"New user! Users: {len(Users.select())}")
+
+        return db
 
     async def func(self):
         raise NotImplementedError

@@ -1,6 +1,8 @@
-from client_handlers.base import *
-from datetime import datetime, time
+from datetime import datetime
 
+from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton
+
+from client_handlers.base import *
 from database.models import SendTime
 
 
@@ -8,17 +10,43 @@ class StartCmd(BaseHandler):
     FILTER = command("start")
 
     @property
-    def nearest_missions(self):
+    def nearest_times(self):
         now = datetime.now()
         nearest = SendTime.select().where(
             ((SendTime.consider_date & SendTime.send_date == now.date()) |
-            (SendTime.weekday.between(0, 6) & SendTime.weekday == now.weekday())) &
+             (SendTime.weekday.between(0, 6) & SendTime.weekday == now.weekday())) &
             (SendTime.send_time >= now.time())
         ).order_by(SendTime.send_time)
-        max_ = max(map(lambda t: t.send_time, nearest))
-        same_max_operations = tuple(filter(lambda t: t.send_time == max_, nearest))
 
-        return map(lambda t: t.oper[0], same_max_operations)
+        return nearest
+
+    @property
+    def nearest_missions(self):
+        nearest = self.nearest_times
+        min_ = min(map(lambda t: t.send_time, nearest))
+        same_min_operations = tuple(filter(lambda t: t.send_time == min_, nearest))
+
+        return map(lambda t: t.oper[0], same_min_operations)
+
+    @property
+    def nearest_mission_for_current_user(self):
+        nearest = self.nearest_times
+        user = self.db_user
+
+        a = map(lambda t: t.oper[0], nearest)
+        b = filter(lambda o: o.created_by == user, a)
+        c = min(b, key=lambda o: o.send_at.send_time)
+
+        return c
 
     async def func(self):
-        await self.request.answer("Бот запущен!\nБлижайшая операция: {}")
+        keyboard = ReplyKeyboardMarkup([
+            [KeyboardButton("Добавить напоминание"), KeyboardButton("Мои напоминания")],
+        ])
+        nearest_mission_for_current_user = self.nearest_mission_for_current_user
+        await self.request.reply(
+            f"Ближайшее напоминание:\n\n"
+            f"{nearest_mission_for_current_user.text}"
+            f"\n\n Время отправки: {nearest_mission_for_current_user.send_at.send_time}",
+            reply_markup=keyboard
+        )
