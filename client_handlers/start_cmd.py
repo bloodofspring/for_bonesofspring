@@ -4,6 +4,7 @@ from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from client_handlers.base import *
 from database.models import SendTime
+from util import render_notification
 
 
 class StartCmd(BaseHandler):
@@ -43,10 +44,7 @@ class StartCmd(BaseHandler):
         keyboard = ReplyKeyboardMarkup([
             [KeyboardButton("Добавить напоминание"), KeyboardButton("Мои напоминания")],
         ])
-        nearest_mission_for_current_user = self.nearest_mission_for_current_user
         await self.request.reply(
-            f"Ближайшее напоминание:\n\n"
-            f"{nearest_mission_for_current_user.text}"
-            f"\n\n Время отправки: {nearest_mission_for_current_user.send_at.send_time}",
+            render_notification(self.nearest_mission_for_current_user),
             reply_markup=keyboard
         )

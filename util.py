@@ -32,7 +32,7 @@ def color_log(text: str, colors: str | list[str], head_c: str = Fore.LIGHTWHITE_
     print(head_c + f"[{now}]: >> " + res)
 
 
-def render_notification(notification: Notifications):
+def render_notification(notification: Notifications) -> str:
     send_at: SendTime = notification.send_at[0]
 
     if send_at.consider_date:
