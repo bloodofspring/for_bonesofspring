@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from client_handlers.base import *
-from database.models import Notifications
+from database.models import Notifications, SendTime, CreatedTimePoints
 from util import render_notification
 
 
@@ -111,7 +111,7 @@ class GetDateTimeAndChat(BaseHandler):
 
         return keyboard
 
-    def set_values(self):  # call data format! "CHANGE-YYYY-MM-DD-HH-MM-SS-1-0-1" (reg_weekday, reg_date, del_after_exec)
+    def set_values(self):  # call data format "CHANGE-YYYY-MM-DD-HH-MM-SS-1-0-1" (reg_weekday, reg_date, del_after_exec)
         self.datetime = datetime(*map(int, self.request.data.split("-")[1:7]))
         self.reg_weekday = bool(self.request.data.split("-")[7])
         self.reg_date = bool(self.request.data.split("-")[8])
@@ -128,8 +128,25 @@ class GetDateTimeAndChat(BaseHandler):
 
         return call_data
 
+    async def submit(self):
+        created_send_time = SendTime.create(
+            send_date=self.datetime.date(),
+            send_time=self.datetime.time(),
+            consider_date=self.reg_date,
+            weekday=self.datetime.weekday() if self.reg_weekday else -1,
+            delete_after_execution=self.del_after_exec,
+        )
+        CreatedTimePoints.create(time_point=created_send_time, user=self.db_user)
+
+        await self.request.message.edit("Время отправки сохранено!")
+        # Отправить сообщение для выбора ID чата
+
     async def func(self):
+        if self.request.data == "CHANGE-SUBMIT":
+            await self.submit()
+            return
         self.set_values()
+        await self.request.message.edit("Выберите время отправки", reply_markup=self.date_keyboard)
 
 
 class AddMission(BaseHandler):
