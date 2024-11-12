@@ -65,47 +65,48 @@ class GetDateTimeAndChat(BaseHandler):
     def date_keyboard(self) -> InlineKeyboardMarkup:
         keyboard = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("<<", callback_data="change date day -1"),
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(days=-1))),
                 InlineKeyboardButton("День: {}".format(self.datetime.day), callback_data=""),
-                InlineKeyboardButton(">>", callback_data="change date day +1")
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(days=1)))
             ],
             [
-                InlineKeyboardButton("<<", callback_data="date month -1"),
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(days=-30))),
                 InlineKeyboardButton("Месяц: {}".format(self.datetime.month), callback_data=""),
-                InlineKeyboardButton(">>", callback_data="change date month +1")
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(days=30)))
             ],
             [
-                InlineKeyboardButton("<<", callback_data="date year -1"),
-                InlineKeyboardButton("Год: {}".format(self.datetime.year), callback_data="", ),
-                InlineKeyboardButton(">>", callback_data="change date year -1")
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(days=-365))),
+                InlineKeyboardButton("Год: {}".format(self.datetime.year), callback_data=""),
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(days=365)))
             ],
             [InlineKeyboardButton(
-                "Не учитывать дату" if self.reg_date else "Учитывать дату", callback_data="change_consider_date"
+                "Не учитывать дату" if self.reg_date else "Учитывать дату",
+                callback_data=self.to_call_data(reg_date=not self.reg_date)
             )],
             [
-                InlineKeyboardButton("<<", callback_data="change hour -1"),
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(hours=-1))),
                 InlineKeyboardButton("Час: {}".format(self.datetime.hour), callback_data=""),
-                InlineKeyboardButton(">>", callback_data="change hour +1")
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(hours=1)))
             ],
             [
-                InlineKeyboardButton("<<", callback_data="change minute -1"),
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(minutes=-1))),
                 InlineKeyboardButton("минута: {}".format(self.datetime.minute), callback_data=""),
-                InlineKeyboardButton(">>", callback_data="change minute +1")
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(days=1)))
             ],
             [
-                InlineKeyboardButton("<<", callback_data="change second -1"),
+                InlineKeyboardButton("<<", callback_data=self.to_call_data(time_delta=timedelta(seconds=-1))),
                 InlineKeyboardButton("Секунда: {}".format(self.datetime.second), callback_data=""),
-                InlineKeyboardButton(">>", callback_data="change second +1")
+                InlineKeyboardButton(">>", callback_data=self.to_call_data(time_delta=timedelta(seconds=1)))
             ],
             [InlineKeyboardButton(
                 "Не учитывать день недели" if self.reg_weekday else "Учитывать день недели",
-                callback_data="change_reg_weekday"
+                callback_data=self.to_call_data(reg_weekday=not self.reg_weekday)
             )],
             [InlineKeyboardButton(
                 "Не удалять после исполнения" if self.del_after_exec else "Удалить после исполнения",
-                callback_data="change_del_after_exec"
+                callback_data=self.to_call_data(del_after_exec=not self.del_after_exec)
             )],
-            [InlineKeyboardButton("Готово", callback_data="change submit")],
+            [InlineKeyboardButton("Готово", callback_data="CHANGE-SUBMIT")],
         ])
 
         return keyboard
@@ -116,9 +117,9 @@ class GetDateTimeAndChat(BaseHandler):
         self.reg_date = bool(self.request.data.split("-")[8])
         self.del_after_exec = bool(self.request.data.split("-")[9])
 
-    def to_call_data(self, time_delta: timedelta, reg_weekday=None, reg_date=None, del_after_exec=None) -> str:
+    def to_call_data(self, time_delta: timedelta = timedelta(), reg_weekday=None, reg_date=None, del_after_exec=None) -> str:
         call_data = "CHANGE-"
-        call_data += str(self.datetime).replace(" ", "-")
+        call_data += str(self.datetime + time_delta).replace(" ", "-")
         call_data += (
             f"-{int(self.reg_weekday) if time_delta is None else int(reg_weekday)}"
             f"-{int(self.reg_date) if reg_date is None else int(reg_date)}-"
