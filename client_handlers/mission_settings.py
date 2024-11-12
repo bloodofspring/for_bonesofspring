@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from client_handlers.base import *
@@ -46,8 +48,77 @@ class Mission(BaseHandler):
         )
 
 
+class GetDateTimeAndChat(BaseHandler):
+    FILTER = create(lambda _, __, q: q & q.data & q.data.startswith("change"))
+
+    def __init__(self):
+        super().__init__()
+        self.datetime = datetime(
+            year=0, month=0, day=0,
+            hour=0, minute=0, second=0,
+        )
+        self.reg_weekday = False
+        self.reg_date = False
+        self.del_after_exec = False
+
+    @property
+    def date_keyboard(self) -> InlineKeyboardMarkup:
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("<<", callback_data="change date day -1"),
+                InlineKeyboardButton("День: {}".format(self.datetime.day), callback_data=""),
+                InlineKeyboardButton(">>", callback_data="change date day +1")
+            ],
+            [
+                InlineKeyboardButton("<<", callback_data="date month -1"),
+                InlineKeyboardButton("Месяц: {}".format(self.datetime.month), callback_data=""),
+                InlineKeyboardButton(">>", callback_data="change date month +1")
+            ],
+            [
+                InlineKeyboardButton("<<", callback_data="date year -1"),
+                InlineKeyboardButton("Год: {}".format(self.datetime.year), callback_data="", ),
+                InlineKeyboardButton(">>", callback_data="change date year -1")
+            ],
+            [InlineKeyboardButton(
+                "Не учитывать дату" if self.reg_date else "Учитывать дату", callback_data="change_consider_date"
+            )],
+            [
+                InlineKeyboardButton("<<", callback_data="change hour -1"),
+                InlineKeyboardButton("Час: {}".format(self.datetime.hour), callback_data=""),
+                InlineKeyboardButton(">>", callback_data="change hour +1")
+            ],
+            [
+                InlineKeyboardButton("<<", callback_data="change minute -1"),
+                InlineKeyboardButton("минута: {}".format(self.datetime.minute), callback_data=""),
+                InlineKeyboardButton(">>", callback_data="change minute +1")
+            ],
+            [
+                InlineKeyboardButton("<<", callback_data="change second -1"),
+                InlineKeyboardButton("Секунда: {}".format(self.datetime.second), callback_data=""),
+                InlineKeyboardButton(">>", callback_data="change second +1")
+            ],
+            [InlineKeyboardButton(
+                "Не учитывать день недели" if self.reg_weekday else "Учитывать день недели",
+                callback_data="change_reg_weekday"
+            )],
+            [InlineKeyboardButton(
+                "Не удалять после исполнения" if self.del_after_exec else "Удалить после исполнения",
+                callback_data="change_del_after_exec"
+            )],
+            [InlineKeyboardButton("Готово", callback_data="change submit")],
+        ])
+
+        return keyboard
+
+    async def func(self):
+        pass
+
+
 class AddMission(BaseHandler):
     FILTER = regex("Добавить напоминание")
+
+    async def get_chat(self):
+        pass
 
     async def func(self):
         pass
