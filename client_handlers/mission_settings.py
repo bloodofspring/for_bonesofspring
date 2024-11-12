@@ -49,7 +49,7 @@ class Mission(BaseHandler):
 
 
 class GetDateTimeAndChat(BaseHandler):
-    FILTER = create(lambda _, __, q: q & q.data & q.data.startswith("change"))
+    FILTER = create(lambda _, __, q: q & q.data & q.data.startswith("CHANGE"))
 
     def __init__(self):
         super().__init__()
@@ -110,8 +110,14 @@ class GetDateTimeAndChat(BaseHandler):
 
         return keyboard
 
+    def set_values(self):  # call data format! "CHANGE-YYYY-MM-DD-HH-MM-SS-1-0-1" (reg_weekday, reg_date, del_after_exec)
+        self.datetime = datetime(*map(int, self.request.data.split("-")[1:7]))
+        self.reg_weekday = bool(self.request.data.split("-")[7])
+        self.reg_date = bool(self.request.data.split("-")[8])
+        self.del_after_exec = bool(self.request.data.split("-")[9])
+
     async def func(self):
-        pass
+        self.set_values()
 
 
 class AddMission(BaseHandler):
