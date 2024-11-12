@@ -116,6 +116,14 @@ class GetDateTimeAndChat(BaseHandler):
         self.reg_date = bool(self.request.data.split("-")[8])
         self.del_after_exec = bool(self.request.data.split("-")[9])
 
+    @property
+    def to_call_data(self) -> str:
+        call_data = "CHANGE-"
+        call_data += str(self.datetime).replace(" ", "-")
+        call_data += f"-{int(self.reg_weekday)}-{int(self.reg_date)}-{int(self.del_after_exec)}"
+
+        return call_data
+
     async def func(self):
         self.set_values()
 
