@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -116,11 +116,14 @@ class GetDateTimeAndChat(BaseHandler):
         self.reg_date = bool(self.request.data.split("-")[8])
         self.del_after_exec = bool(self.request.data.split("-")[9])
 
-    @property
-    def to_call_data(self) -> str:
+    def to_call_data(self, time_delta: timedelta, reg_weekday=None, reg_date=None, del_after_exec=None) -> str:
         call_data = "CHANGE-"
         call_data += str(self.datetime).replace(" ", "-")
-        call_data += f"-{int(self.reg_weekday)}-{int(self.reg_date)}-{int(self.del_after_exec)}"
+        call_data += (
+            f"-{int(self.reg_weekday) if time_delta is None else int(reg_weekday)}"
+            f"-{int(self.reg_date) if reg_date is None else int(reg_date)}-"
+            f"{int(self.del_after_exec) if del_after_exec is None else int(del_after_exec)}"
+        )
 
         return call_data
 
