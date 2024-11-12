@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from colorama import Fore
 
@@ -13,6 +13,13 @@ weekdays = {
     5: "в субботу",
     6: "в воскресенье",
 }
+
+
+def clear_unused_time_points(user):
+    unused = filter(lambda t: t.updated_at <= datetime.now() - timedelta(days=1), user.created_tp)
+    for tp in unused:
+        SendTime.delete_by_id(tp.id)
+
 
 
 def color_log(text: str, colors: str | list[str], head_c: str = Fore.LIGHTWHITE_EX, separator: str = " ") -> None:

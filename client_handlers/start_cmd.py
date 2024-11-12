@@ -4,7 +4,7 @@ from pyrogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from client_handlers.base import *
 from database.models import SendTime
-from util import render_notification
+from util import render_notification, clear_unused_time_points
 
 
 class StartCmd(BaseHandler):
@@ -33,6 +33,7 @@ class StartCmd(BaseHandler):
     def nearest_mission_for_current_user(self):
         nearest = self.nearest_times
         user = self.db_user
+        clear_unused_time_points(user=user)
 
         a = map(lambda t: t.oper[0], nearest)
         b = filter(lambda o: o.created_by == user, a)
